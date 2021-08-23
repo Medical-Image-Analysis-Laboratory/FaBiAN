@@ -1,6 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Function that reads the high-resolution segmented images of the fetal  %
-%  brain from which the simulated images will be derived.                 %
+%  Function that reads the high-resolution segmented anatomical MR        %
+%  images of the fetal brain from which the simulated images will be      %
+%  derived.                                                               %
 %  Here, we consider high-resolution segmented images from Gholipour, A.  %
 %  et al. A normative spatiotemporal MRI atlas of the fetal brain for     %
 %  automatic segmentation and analysis of early brain growth. Scientific  %
