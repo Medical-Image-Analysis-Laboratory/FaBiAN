@@ -14,7 +14,7 @@
 %  output:  - Fetal_Brain: 3D volume of the fetal brain                   %
 %                                                                         %
 %                                                                         %
-%  Hélène Lajous, 2021-04-21                                              %
+%  Hélène Lajous, 2021-08-23                                              %
 %                                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
