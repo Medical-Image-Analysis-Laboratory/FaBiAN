@@ -6,6 +6,14 @@
 %  automatic segmentation and analysis of early brain growth. Scientific  %
 %  Reports 7, 1–13, DOI: 10.1038/s41598-017-00525-w (2017).               %
 %                                                                         %
+%                   Fetal_Brain = brain_model(path, GA)                   %
+%                                                                         %
+%  input:   - path: folder where the high-resolution segmented images of  %
+%                   the fetal brain are stored                            %
+%           - GA: gestational age of the fetus (in weeks)                 %
+%                                                                         %
+%  output:  - Fetal_Brain: 3D volume of the fetal brain                   %
+%                                                                         %
 %                                                                         %
 %  Hélène Lajous, 2021-04-30                                              %
 %                                                                         %
