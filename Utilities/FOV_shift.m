@@ -1,8 +1,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Function that redefines the field-of-view (FOV) that covers the fetal  %
-%  brain volume based on the shift that is applied in the slice           %
-%  thickness direction between the acquisition of two low-resolution      %
-%  series in the same orientation.                                        %
+%  Function that redefines the position of the slice slab that covers     %
+%  the fetal brain volume based on the shift that is applied in the       %
+%  slice thickness direction between the acquisition of two               %
+%  low-resolution series in the same orientation.                         %
+%                                                                         %
+%      Fetal_Brain_shift = FOV_shift(Fetal_Brain, shift, orientation)     %
+%                                                                         %
+%  input:   - Fetal_Brain: 3D volume of the fetal brain                   %
+%           - shift: displacement (in voxels) to apply to the slice slab  &
+%                    in the slice thickness direction                     %
+%           - orientation: slice thickness direction                      %
+%                                                                         %
+%  output:  - Fetal_Brain: 3D volume of the fetal brain                   %
 %                                                                         %
 %                                                                         %
 %  Hélène Lajous, 2021-04-21                                              %
@@ -23,12 +32,14 @@ elseif nargin > 3
 end
 
 
-% Slightly shift the FOV in the slice thickness direction (as done in the
-% clinics)
-Fetal_Brain_FOV = {1+ceil(abs(shift)):size(Fetal_Brain,1)-(1+ceil(abs(shift))); 1+ceil(abs(shift)):size(Fetal_Brain,2)-(1+ceil(abs(shift))); 1+ceil(abs(shift)):size(Fetal_Brain,3)-(1+ceil(abs(shift)))};
+% Resize the fetal brain volume to allow shifting in any direction
+Fetal_Brain_FOV = {1+ceil(abs(shift)):size(Fetal_Brain,1)-ceil(abs(shift)); 1+ceil(abs(shift)):size(Fetal_Brain,2)-ceil(abs(shift)); 1+ceil(abs(shift)):size(Fetal_Brain,3)-ceil(abs(shift))};
+
+% Slightly shift the slice slab in the slice thickness direction (as done
+% in the clinics)
 Fetal_Brain_FOV{orientation} = Fetal_Brain_FOV{orientation} + shift;
 
-% Mask the fetal brain after having shifted the FOV
+% Mask the fetal brain after having shifted the slice slab
 Fetal_Brain_shift = Fetal_Brain(Fetal_Brain_FOV{1}, Fetal_Brain_FOV{2}, Fetal_Brain_FOV{3});
 
 % Display message for debugging
