@@ -21,8 +21,8 @@
 
 
 function Volume_resampled = sampling_OoP(              Volume, ...
-                                                sampling_factor, ...
-                                           interpolation_method)
+                                              sampling_factor, ...
+                                         interpolation_method)
 
 
 % Input check
