@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  This demonstration script of FaBiAN use and functionalities generates  %
-%  T2-weighted MR images of the fetal brain based on the highly flexible  %
-%  simulation of fast spin echo (FSE) sequences from various MR vendors   %
+%  T2-weighted MR images of the fetal brain based on highly flexible      %
+%  simulations of fast spin echo (FSE) sequences from various MR vendors  %
 %  and at different magnetic field strengths throughout gestation.        %
 %  This demonstration script simulates:                                   %
 %  (i) HASTE acquisitions as implemented by Siemens Healthineers on a     %
