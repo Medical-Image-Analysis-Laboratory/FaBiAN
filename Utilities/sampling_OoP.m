@@ -1,21 +1,24 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Function that resamples a 3D volume by a given sampling factor and     %
 %  according to the specified interpolation method in the slice           %
-%  thickness direction (3. index).                                        %
+%  thickness direction (3. index, "Out-of-Plane").                        %
 %                                                                         %
 %          Volume_resampled = sampling_OoP(              Volume, ...      %
 %                                               sampling_factor, ...      %
-%                                          interpolation_method)          %
+%                                          interpolation_method);         %
 %                                                                         %
 %  input:   - Volume: 3D volume to be resampled                           %
-%           - sampling_factor: factor of (up-)/(down-)sampling            %
-%           - interpolation_method: method to be used for the             %
-%                                   interpolation                         %
+%           - sampling_factor: factor of up- or down-sampling             %
+%           - interpolation_method: interpolation method used to assign   %
+%                                   a value to every voxel of the 3D      %
+%                                   volume after resampling               %
 %                                                                         %
-%  output:  - Volume_resampled: resampled 3D volume                       %
+%  output:  - Volume_resampled: 3D volume after resampling in the slice   %
+%                               thickness direction                       %
 %                                                                         %
 %                                                                         %
 %  Hélène Lajous, 2021-04-21                                              %
+%  helene.lajous@unil.ch                                                  %
 %                                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -23,7 +26,6 @@
 function Volume_resampled = sampling_OoP(              Volume, ...
                                               sampling_factor, ...
                                          interpolation_method)
-
 
 % Input check
 if nargin < 3
@@ -47,3 +49,5 @@ end
 
 % Display message for debugging
 sprintf('Volume resampled.')
+
+end
