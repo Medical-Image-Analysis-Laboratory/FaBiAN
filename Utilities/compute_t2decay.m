@@ -16,7 +16,7 @@
 %                                                  ref_T1map, ...         %
 %                                                  ref_T2map, ...         %
 %                                                        ETL, ...         %
-%                                                         TE, ...         %
+%                                                        ESP, ...         %
 %                                            sampling_factor);            %
 %                                                                         %
 %  inputs:  - Fetal_Brain_upsampled: segmented high-resolution 3D volume  %
@@ -29,7 +29,7 @@
 %           - ref_T1map: reference T1 map of the fetal brain (3D)         %
 %           - ref_T2map: reference T2 map of the fetal brain (3D)         %
 %           - ETL: echo train length, i.e. number of 180°-RF pulses       %
-%           - TE: echo spacing (in ms)                                    %
+%           - ESP: echo spacing (in ms)                                   %
 %           - sampling_factor: factor by which the fetal brain volume     %
 %                              and the B1 bias field have been upsampled  %
 %                                                                         %
@@ -50,7 +50,7 @@ function T2decay = compute_t2decay(Fetal_Brain_upsampled, ...
                                                ref_T1map, ...
                                                ref_T2map, ...
                                                      ETL, ...
-                                                      TE, ...
+                                                     ESP, ...
                                          sampling_factor)
 
 % Input check
@@ -78,7 +78,7 @@ uT2decay = zeros(length(umap), ETL);
 tic
 
 parfor i=1:size(uT2decay,1)
-    uT2decay(i, :) = real(cp_cpmg_epg_domain_fplus_fminus(umap(i,1).*90, ETL, umap(i,1).*180, TE, umap(i,2), umap(i,3)))/sampling_factor;
+    uT2decay(i, :) = real(cp_cpmg_epg_domain_fplus_fminus(umap(i,1).*90, ETL, umap(i,1).*180, ESP, umap(i,2), umap(i,3)))/sampling_factor;
 end
 
 T2decay = zeros(length(Fetal_Brain_upsampled(:)), ETL, 'single');
