@@ -1,8 +1,15 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Function that computes the T2 decay in every voxel of a 3D volume of   %
-%  the fetal brain from reference T1 and T2 maps, sequence parameters     %
-%  and intensity non-uniformity fields, following the Extended Phase      %
-%  Graph (EPG) formalism.                                                 %
+%  Function that computes the T2 decay in every voxel of the fetal brain  %
+%  volume from reference T1 and T2 maps, sequence parameters and          %
+%  intensity non-uniformity fields, following the Extended Phase Graph    %
+%  (EPG) formalism.                                                       %
+%  The EPG concept is described in details in: Weigel, M. Extended phase  %
+%  graphs: Dephasing, RF pulses, and echoes - pure and simple. Journal    %
+%  of Magnetic Resonance Imaging 41, 266-295 (2015).                      %
+%  https://doi.org/10.1002/jmri.24619. The associated EPG simulation      %
+%  code from Matthias Weigel for multi-spin echo sequences                %
+%  (cp_cpmg_epg_domain_fplus_fminus.m) used in the following can be       %
+%  downloaded here: https://github.com/matthias-weigel/EPG.               %
 %                                                                         %
 %            T2decay = compute_t2decay(Fetal_Brain_upsampled, ...         %
 %                                            b1map_upsampled, ...         %
