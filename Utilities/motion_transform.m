@@ -9,9 +9,8 @@
 %                   rotation_axis] = motion_transform(motion_level, ...   %
 %                                                         NbSlices);      %
 %                                                                         %
-%  input:   - motion_level: amplitude of rigid motion of the fetus to be  %
-%                           simulated (0: no motion; 1: little motion;    %
-%                           2: moderate motion; 3: strong motion)         %
+%  input:   - motion_level: amplitude of rigid fetal movements to         %
+%                           simulate                                      %
 %           - NbSlices: number of slices                                  %
 %                                                                         %
 %  outputs: - motion_corrupted_slices: list of indexes of the slices      %
