@@ -83,7 +83,7 @@
 %           - nPE: number of phase encoding lines                         %
 %           - ACF: acceleration factor                                    %
 %           - RefLines: number of lines that are consecutively sampled    %
-%                       around the center of k-space                      %
+%                       around the center of K-space                      %
 %                                                                         %
 %  output:  - KSpace: Fourier domain of the simulated images              %
 %                                                                         %
