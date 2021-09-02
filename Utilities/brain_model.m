@@ -5,7 +5,7 @@
 %  Here, we consider segmented high-resolution images from Gholipour, A.  %
 %  et al. A normative spatiotemporal MRI atlas of the fetal brain for     %
 %  automatic segmentation and analysis of early brain growth. Scientific  %
-%  Reports 7, 1–13, DOI: 10.1038/s41598-017-00525-w (2017).               %
+%  Reports 7, 476 (2017). https://doi.org/10.1038/s41598-017-00525-w      %
 %                                                                         %
 %                   Fetal_Brain = brain_model(path, GA);                  %
 %                                                                         %
