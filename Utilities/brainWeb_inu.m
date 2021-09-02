@@ -1,23 +1,25 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Function that calls simulated intensity non-uniformity fields (3D),    %
-%  resizes them to the fetal brain volume dimensions and normalizes them  %
-%  to a level of 40% (i.e., to a range of values of 0.8-1.2 over the      %
-%  fetal brain volume).                                                   %
+%  Function that calls the simulated intensity non-uniformity fields      %
+%  (3D) from the BrainWeb database, resizes them to the fetal brain       %
+%  volume dimensions and normalizes them to a level of 40% (i.e., to an   %
+%  intensity range of 0.8 to 1.2 over the fetal brain volume).            %
 %                                                                         %
-%                  b1map = brainWeb_inu(inu, Fetal_Brain)                 %
+%                 b1map = brainWeb_inu(inu, Fetal_Brain);                 %
 %                                                                         %
 %  input:   - inu: simulated intensity non-uniformity fields (3D). Here,  %
 %                  we consider B1 bias field variations in raw byte       %
 %                  (unsigned) format obtained from the BrainWeb database  %
 %                  -- BrainWeb: Simulated brain database.                 %
 %                  https://brainweb.bic.mni.mcgill.ca/brainweb/ --        %
-%           - Fetal_Brain: fetal brain volume                             %
+%           - Fetal_Brain: segmented high-resolution 3D volume of the     %
+%                          fetal brain                                    %
 %                                                                         %
-%  output:  - b1map: simulated B1 bias field variations. This 3D volume   %
-%                    is the same size as the fetal brain volume.          %
+%  output:  - b1map: simulated B1 bias field variations (B1+). This 3D    %
+%                    volume is the same size as the fetal brain volume.   %
 %                                                                         %
 %                                                                         %
 %  Hélène Lajous, 2020-09-30                                              %
+%  helene.lajous@unil.ch                                                  %
 %                                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -53,3 +55,5 @@ b1map_res = Resize_Volume(volume, size(Fetal_Brain));
 b1map = b1map_res ./ max(max(max(b1map_res))) * 1.2;
 
 fclose(f);
+
+end
