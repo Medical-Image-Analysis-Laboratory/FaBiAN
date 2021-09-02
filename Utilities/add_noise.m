@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Function that adds complex Gaussian noise (mean=0, std=user-defined)   %
-%  to a volume in K-space.                                                %
+%  Function that adds complex Gaussian noise (mean=0, standard deviation  %
+%  to be defined by the user) to a volume in the Fourier domain.          %
 %                                                                         %
 %               KSpace_noise = add_noise(KSpace, std_noise);              %
 %                                                                         %
