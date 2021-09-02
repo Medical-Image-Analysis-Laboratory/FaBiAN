@@ -1,11 +1,16 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  This script shrinks or expands a multi-dimensional image for a         %
+%  desired size.                                                          %
+%                                                                         %
+%                                                                         %
+%  Christopher W. Roy, 2018-12-04                                         %
+%  fetal.xcmr@gmail.com                                                   %
+%                                                                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 function [I,y,x] = Resize_Volume(I,sz)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% This script shrinks or expands a multi-dimensional image for a desired
-% size
-%
-% Christopher W. Roy 2018-12-04
-% fetal.xcmr@gmail.com
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 if size(I,1)~=sz(1)||size(I,2)~=sz(2)||size(I,3)~=sz(3)
     
     if ~exist('sz','var')
