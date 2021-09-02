@@ -1,8 +1,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Function that compiles the name of the output folder according to the  %
-%  GA of the fetus, to the level of fetal movements, to the acquisition   %
-%  plane and to the displacement of the fetal brain volume in a given     %
-%  orientation from one series to the other.                              %
+%  Function that compiles the name of the output folder where the         %
+%  simulated images are saved according to the gestational age of the     %
+%  fetus, to the level of fetal movements, to the acquisition plane and   %
+%  to the displacement of the fetal brain volume in a given orientation   %
+%  from one series to the other.                                          %
 %                                                                         %
 %                output_folder = output_name(          GA, ...            %
 %                                            motion_level, ...            %
