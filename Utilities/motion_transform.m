@@ -14,7 +14,7 @@
 %                           2: moderate motion; 3: strong motion)         %
 %           - NbSlices: number of slices                                  %
 %                                                                         %
-%  output:  - motion_corrupted_slices: list of indexes of the slices      %
+%  outputs: - motion_corrupted_slices: list of indexes of the slices      %
 %                                      corrupted by motion                %
 %           - translation_displacement: table of translation              %
 %                                       displacements (in mm) along the   %
