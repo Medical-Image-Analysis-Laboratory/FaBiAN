@@ -1,5 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Function that samples the K-space of the simulated HASTE images.       %
+%  Function that samples the Fourier domain (K-space) of the simulated    %
+%  images according to the acquisition scheme implemented in Fast Spin    %
+%  Echo (FSE) sequences.                                                  %
 %                                                                         %
 %        KSpace = Kspace_sampling(                     T2decay_zp, ...    %
 %                                                     Fetal_Brain, ...    %
@@ -198,7 +200,7 @@ for iSlice=1:length(interleavedSlices_index)
     % Sum the contribution of all voxels at the same (x,y) location across
     % the slice thickness direction
     Sl_Volume(:,:,interleavedSlices_index(iSlice),:) = sum(T2decay_zp(:,:,index:index+SliceThickness/SubunitRes-1,:),3);
-    % Simulation of k-space sampling as for HASTE acquisitions
+    % Simulation of k-space sampling as for FSE sequences
 %     tic
     for iEcho=1:size(Sl_Volume,4)
         clc;
@@ -206,7 +208,6 @@ for iSlice=1:length(interleavedSlices_index)
         SLAB(:,:,interleavedSlices_index(iSlice),iEcho) = Resize_Volume(fft2c(Resize_Volume(Sl_Volume(:,:,interleavedSlices_index(iSlice),iEcho), [FOVRead/SimRes, round(FOVPhase)/SimRes, NbSlices])), [BaseResolution, nPE, NbSlices]);
     end
 %     toc
-    %
 %     tic
 	% Calculating k-space sampling based on the desired echo time occuring
     % at the center of k-space
