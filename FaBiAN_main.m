@@ -128,7 +128,7 @@ end
 addpath('Utilities')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Load fetal brain model                                                 %
+%  Load fetal brain model and intensity non-uniformity fields             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Load segmented high-resolution images of the fetal brain at gestational
@@ -136,7 +136,7 @@ addpath('Utilities')
 Fetal_Brain = brain_model(Fetal_Brain_model_path, GA);
 
 % Convert the shift variable into a number of voxels
-shift = shift_mm / SimRes;
+shift = shift_mm / SimRes;  %in voxels
 
 % Define the slice slab that covers the fetal brain volume based on the
 % shift variable in the slice thickness direction and the acquisition plane
@@ -178,6 +178,10 @@ Fetal_Brain_Tissues = permute(Fetal_Brain_Labels, [2,1]);
 
 % Generate reference T1 and T2 maps of the fetal brain
 [ref_T1map, ref_T2map] = tissue_to_MR(Fetal_Brain_upsampled, Fetal_Brain_Tissues, B0);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Extended Phase Graph (EPG) simulations                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Run EPG simulations in every voxel of the fetal brain volume
 T2decay = compute_t2decay(Fetal_Brain_upsampled, ...
@@ -228,7 +232,7 @@ T2decay_zp = Resize_Volume(T2decay, [T2decay_MaxDim, T2decay_MaxDim, T2decay_Max
 %  K-space sampling of the simulated FSE images                           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Acquire data following an interleaved acquisition scheme
+% Data sampling follows an interleaved acquisition scheme
 interleavedSlices_index = interleaved_scheme(NbSlices);
 
 [ motion_corrupted_slices, ...
@@ -273,6 +277,10 @@ end
 
 % Add complex Gaussian noise to K-space
 KSpace_noise = add_noise(KSpace, std_noise);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Final simulated FSE images                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Turn back data in K-space to the image space
 FSE_Images = imresize(ifft2c(KSpace_noise), [size(KSpace,1), round(size(KSpace,2)/PhaseResolution)]);
