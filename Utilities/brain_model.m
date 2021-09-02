@@ -34,7 +34,8 @@ elseif nargin > 2
     error('Too many inputs.');
 end
 
-% Load segmented high-resolution anatomical MR images of the fetal brain at gestational age GA
+% Load segmented high-resolution anatomical MR images of the fetal brain at
+% gestational age GA
 Fetal_Brain = niftiread(strcat(path, 'STA', sprintf('%02s', num2str(GA)), '_tissue.nii.gz'));
 
 end
