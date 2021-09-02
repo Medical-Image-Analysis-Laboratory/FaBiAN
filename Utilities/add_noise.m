@@ -4,7 +4,7 @@
 %                                                                         %
 %               KSpace_noise = add_noise(KSpace, std_noise);              %
 %                                                                         %
-%  input:   - KSpace: Fourier domain of the simulated images              %
+%  inputs:  - KSpace: Fourier domain of the simulated images              %
 %           - std_noise: standard deviation of the Gaussian noise added   %
 %                        to the Fourier domain of the simulated images    %
 %                                                                         %

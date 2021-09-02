@@ -7,7 +7,7 @@
 %                                               sampling_factor, ...      %
 %                                          interpolation_method);         %
 %                                                                         %
-%  input:   - Volume: 3D volume to be resampled                           %
+%  inputs:  - Volume: 3D volume to be resampled                           %
 %           - sampling_factor: factor of up- or down-sampling             %
 %           - interpolation_method: interpolation method used to assign   %
 %                                   a value to every voxel of the 3D      %

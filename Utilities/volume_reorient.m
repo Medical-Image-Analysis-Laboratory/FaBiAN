@@ -4,7 +4,7 @@
 %                                                                         %
 %        Volume_Reoriented = volume_reorient(Volume, orientation);        %
 %                                                                         %
-%  input:   - Volume: 3D volume to be reoriented                          %
+%  inputs:  - Volume: 3D volume to be reoriented                          %
 %           - orientation: strict acquisition plane (axial, coronal or    %
 %                          sagittal)                                      %
 %                                                                         %

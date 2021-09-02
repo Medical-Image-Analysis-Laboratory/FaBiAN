@@ -10,7 +10,7 @@
 %                                            rotation_interpolation, ...  %
 %                                                              bbox);     %
 %                                                                         %
-%  input:   - Fetal_Brain: segmented high-resolution 3D volume of the     %
+%  inputs:  - Fetal_Brain: segmented high-resolution 3D volume of the     %
 %                          fetal brain                                    %
 %           - SimRes: resolution of the original high-resolution fetal    %
 %                     brain images (isotropic, in mm)                     %

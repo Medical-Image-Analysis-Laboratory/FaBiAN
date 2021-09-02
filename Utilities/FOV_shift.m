@@ -8,7 +8,7 @@
 %                                                                         %
 %     Fetal_Brain_shift = FOV_shift(Fetal_Brain, shift, orientation);     %
 %                                                                         %
-%  input:   - Fetal_Brain: segmented high-resolution 3D volume of the     %
+%  inputs:  - Fetal_Brain: segmented high-resolution 3D volume of the     %
 %                          fetal brain                                    %
 %           - shift: displacement (in voxels) of the slice slab in the    %
 %                    slice thickness direction                            %

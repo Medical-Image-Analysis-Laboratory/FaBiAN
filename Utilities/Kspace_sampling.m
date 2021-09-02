@@ -31,7 +31,7 @@
 %                                                             ACF, ...    %
 %                                                       RefLines);        %
 %                                                                         %
-%  input:   - T2decay_zp: 4D matrix that combines the anatomical          %
+%  inputs:  - T2decay_zp: 4D matrix that combines the anatomical          %
 %                         information from the segmented high-resolution  %
 %                         fetal brain volume and the T2 decay computed    %
 %                         in every voxel of this volume after zero-       %

@@ -12,7 +12,7 @@
 %                                                         TE, ...         %
 %                                            sampling_factor);            %
 %                                                                         %
-%  input:   - Fetal_Brain_upsampled: segmented high-resolution 3D volume  %
+%  inputs:  - Fetal_Brain_upsampled: segmented high-resolution 3D volume  %
 %                                    of the fetal brain after upsampling  %
 %                                    by a given sampling factor in the    %
 %                                    slice thickness direction            %

@@ -6,7 +6,7 @@
 %                                                                         %
 %              KSpace_zip = zip_kspace(KSpace, reconMatrix);              %
 %                                                                         %
-%  input:   - KSpace: Fourier domain of the simulated images              %
+%  inputs   - KSpace: Fourier domain of the simulated images              %
 %           - reconMatrix: size of the reconstruction matrix (in voxels)  %
 %                                                                         %
 %  output:  - KSpace_zip: Fourier domain of the simulated images after    %

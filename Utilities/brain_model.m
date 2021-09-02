@@ -9,7 +9,7 @@
 %                                                                         %
 %                   Fetal_Brain = brain_model(path, GA);                  %
 %                                                                         %
-%  input:   - path: folder where the segmented high-resolution MR images  %
+%  inputs:  - path: folder where the segmented high-resolution MR images  %
 %                   of the fetal brain from which our simulations are     %
 %                   derived are stored                                    %
 %           - GA: gestational age of the fetus (in weeks)                 %

@@ -6,7 +6,7 @@
 %                                                                         %
 %                 b1map = brainWeb_inu(inu, Fetal_Brain);                 %
 %                                                                         %
-%  input:   - inu: simulated intensity non-uniformity fields (3D). Here,  %
+%  inputs:  - inu: simulated intensity non-uniformity fields (3D). Here,  %
 %                  we consider B1 bias field variations in raw byte       %
 %                  (unsigned) format obtained from the BrainWeb database  %
 %                  -- BrainWeb: Simulated brain database.                 %
