@@ -1,11 +1,11 @@
 # FaBiAN
 ##################################################################################
-###  							                                                             ###
-###   FaBiAN: "Fetal Brain magnetic resonance Acquisition Numerical phantom"   ###
-### 							                                                             ###
-###   v1.0 						  		                                                   ###
-###   2021-09-03					                       			                         ###
-### 							                       			                                 ###
+
+FaBiAN: "Fetal Brain magnetic resonance Acquisition Numerical phantom"
+
+v1.0
+2021-09-03
+
 ##################################################################################
 
 FaBiAN is the first numerical phantom that simulates realistic T2-weighted magnetic resonance images (MRI) of the developing fetal brain throughout gestation.
@@ -22,7 +22,7 @@ The script "FaBiAN_demo.m" provides examples to generate typical images of the f
 
 
 ##################################################################################
-###   Dependencies 									                                           ###
+Dependencies
 ##################################################################################
 
 This code was tested in MATLAB (MathWorks, R2019a) on a high-performance computing cluster.
@@ -41,7 +41,7 @@ References:
 
 
 ##################################################################################
-###   Distribution of FaBiAN and Citation						                           ###
+Distribution of FaBiAN and Citation
 ##################################################################################
 
 FaBiAN source code is distributed as Matlab files to support its use for research purposes. Anyone is allowed to use the original and/or modified code for non-commercial purposes.
@@ -50,7 +50,7 @@ If you publish research using FaBiAN, please cite the related manuscript: Lajous
 
 
 ##################################################################################
-###   Acknowledgements								                                         ###
+Acknowledgements
 ##################################################################################
 
 This work was supported by the Swiss National Science Foundation through grant 205321-182602. We acknowledge access to the facilities and expertise of the CIBM Center for Biomedical Imaging, a Swiss research center of excellence founded and supported by Lausanne University Hospital (CHUV), University of Lausanne (UNIL), Ecole polytechnique fédérale de Lausanne (EPFL), University of Geneva (UNIGE) and Geneva University Hospitals (HUG).
@@ -59,7 +59,7 @@ Hélène Lajous would like to thank all people who have contributed to the devel
 
 
 ##################################################################################
-###   Contact 										                                             ###
+Contact
 ##################################################################################
 
 For any questions, comments and contributions, please contact:
