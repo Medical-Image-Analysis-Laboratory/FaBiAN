@@ -11,7 +11,7 @@ v1.0
 
 FaBiAN is the first numerical phantom that simulates realistic T2-weighted magnetic resonance images (MRI) of the developing fetal brain throughout gestation.
 
-Implemented in MATLAB (MathWorks, R2019a), FaBiAN is open source. It is built on segmented high-resolution anatomical images of the fetal brain across maturation and relies on the extended phase graph (EPG) formalism [1] of the MR signal formation. It reproduces as closely as possible the physical principles involved in fast spin echo (FSE) sequences and provides:
+Implemented in MATLAB (MathWorks, R2019a), FaBiAN is open source. It is built on segmented high-resolution anatomical images of the fetal brain across maturation and relies on the extended phase graph (EPG) formalism [1] of the MR signal formation. It reproduces as closely as possible the physical principles involved in fast spin echo (FSE) sequences and provides:  
      - a realistic setup that accounts for stimulated echoes and intensity non-uniformity fields, and that includes stochastic movements of the fetus;  
      - a general framework to adjust to the specificities of the FSE sequences developed by various MR vendors (currently, Siemens Healthineers and GE Healthcare);  
      - a high flexibility in the choice of the sequence parameters and anatomical settings available to the user to allow for simulating T2-weighted images of the fetal brain acquired on various MR scanners and at different clinical magnetic field strengths (1.5T and 3T) throughout development;  
@@ -19,7 +19,7 @@ Implemented in MATLAB (MathWorks, R2019a), FaBiAN is open source. It is built on
 
 Thanks to the close resemblance of the simulated images to real clinical MR acquisitions of the fetal brain across maturation, FaBiAN aims at providing the community with a unified environment for the evaluation and validation of advanced post-processing techniques dedicated to improving the analysis of fetal brain MR images and supporting accurate diagnosis. Other applications include data augmentation strategies using the generated images to complement clinical fetal datasets that remain scarce.
 
-The script "FaBiAN_demo.m" provides examples to generate typical images of the fetal brain obtained from simulated (i) HASTE sequences at 1.5 T, and (ii) SS-FSE sequences at 3 T using the main script "FABIAN_main.m".
+The script "FaBiAN_demo.m" provides examples to generate typical images of the fetal brain obtained from simulated (i) HASTE sequences at 1.5T, and (ii) SS-FSE sequences at 3T using the main script "FABIAN_main.m".
 
 
 ### Dependencies ###
