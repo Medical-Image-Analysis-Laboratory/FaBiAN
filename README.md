@@ -1,22 +1,19 @@
-# FaBiAN
+# FaBiAN: "Fetal Brain magnetic resonance Acquisition Numerical phantom"
 
 ----
-
-__FaBiAN: "Fetal Brain magnetic resonance Acquisition Numerical phantom"__
 
 __v1.0__
 
 __2021-09-03__
 
-Copyright (c) 2019-2023  
+__Copyright (c) 2019-2023__  
 
-Medical Image Analysis Laboratory (MIAL), Lausanne, Switzerland  
-Department of Radiology, Lausanne University Hospital (CHUV) and University of Lausanne (UNIL), Lausanne, Switzerland  
-CIBM Center for Biomedical Imaging, Switzerland
+__Medical Image Analysis Laboratory (MIAL), Lausanne, Switzerland__  
+__Department of Radiology, Lausanne University Hospital (CHUV) and University of Lausanne (UNIL), Lausanne, Switzerland__  
+__CIBM Center for Biomedical Imaging, Switzerland__
 
 ----
 
-## Description
 
 FaBiAN is the first numerical phantom that simulates realistic T2-weighted magnetic resonance images (MRI) of the developing fetal brain throughout gestation.
 
