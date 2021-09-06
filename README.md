@@ -9,6 +9,8 @@ v1.0
 
 ======================================================================
 
+### Description ###
+
 FaBiAN is the first numerical phantom that simulates realistic T2-weighted magnetic resonance images (MRI) of the developing fetal brain throughout gestation.
 
 Implemented in MATLAB (MathWorks, R2019a), FaBiAN is open source. It is built on segmented high-resolution anatomical images of the fetal brain and relies on the extended phase graph (EPG) formalism [1] of the MR signal formation. It reproduces as closely as possible the physical principles involved in fast spin echo (FSE) sequences and provides:  
@@ -39,7 +41,7 @@ References:
 
 ### Distribution of FaBiAN and Citation ###
 
-FaBiAN source code is distributed as Matlab files to support its use for research purposes. Anyone is allowed to use the original and/or modified code for non-commercial purposes.
+FaBiAN source code is distributed as Matlab files under the open source BSD 3-Clause License to support its use for research purposes. Anyone is allowed to use the original and/or modified code for non-commercial purposes. See [LICENSE](LICENSE.txt) file for details.
 
 If you publish research using FaBiAN, please cite the related manuscript: Lajous, H. et al. FaBiAN: A Fetal Brain magnetic resonance Acquisition Numerical phantom. Submitted to Scientific Reports (2021).
 
