@@ -1,0 +1,39 @@
+{
+	"license": "BSD-3-Clause",
+    	"keywords":
+	[
+		"Fetal",
+		"Developing brain",
+		"Magnetic Resonance Imaging (MRI)",
+		"Numerical phantom",
+		"Simulation framework",
+		"Fast Spin Echo (FSE) sequences",
+		"Half-Fourier Acquisition Single-shot Turbo spin Echo (HASTE) sequence",
+		"Single-Shot Fast Spin Echo (SS-FSE) sequence"
+	],
+	"creators":
+	[
+		{
+        		"name": "Lajous, Hélène",
+		        "affiliation": "Department of Radiology, Lausanne University Hospital (CHUV) and University of Lausanne (UNIL), Lausanne, Switzerland & CIBM Center for Biomedical Imaging, Switzerland",
+        		"orcid": "0000-0001-7729-6274"
+		},
+		{
+			"name": "Roy, Christopher W.",
+			"affiliation": "Department of Radiology, Lausanne University Hospital (CHUV) and University of Lausanne (UNIL), Lausanne, Switzerland",
+			"orcid": "0000-0002-3111-8840"
+		},
+		{
+			"name": "Yerly, Jérôme",
+			"affiliation": "Department of Radiology, Lausanne University Hospital (CHUV) and University of Lausanne (UNIL), Lausanne, Switzerland & CIBM Center for Biomedical Imaging, Switzerland",
+			"orcid": "0000-0003-4347-8613"
+		},
+		{
+        		"name": "Bach Cuadra, Meritxell",
+		        "affiliation": "CIBM Center for Biomedical Imaging, Switzerland & Department of Radiology, Lausanne University Hospital (CHUV) and University of Lausanne (UNIL), Lausanne, Switzerland",
+        		"orcid": "0000-0003-2730-4285"
+		}
+	],
+	"access_right": "open",
+	"upload_type": "software"
+}
