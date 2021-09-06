@@ -1,10 +1,7 @@
 # FaBiAN: "Fetal Brain magnetic resonance Acquisition Numerical phantom"
 
-----
 
-__v1.0__
-
-__2021-09-03__
+__v1.0, 2021-09-06__
 
 __Copyright (c) 2019-2023__  
 
