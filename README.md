@@ -2,9 +2,9 @@
 
 ### FaBiAN: "Fetal Brain magnetic resonance Acquisition Numerical phantom"
 
-v1.0
+__v1.0__
 
-2021-09-03
+__2021-09-03__
 
 ----
 
@@ -31,11 +31,11 @@ In this first version of FaBiAN, the fetal brain model is based on high-resoluti
 
 Non-linear slowly-varying intensity non-uniformities due to transmit field inhomogeneities (B1+) are based on BrainWeb estimations from real scans to simulate T2-weighted images [4] and can be downloaded from: https://brainweb.bic.mni.mcgill.ca/brainweb/about_sbd.html.
 
-*References:  
-[1] Weigel, M. Extended phase graphs: Dephasing, RF pulses, and echoes - pure and simple. Journal of Magnetic Resonance Imaging 41, 266–295 (2015). https://doi.org/10.1002/jmri.24619  
-[2] https://github.com/matthias-weigel/EPG  
-[3] Gholipour, A. et al. A normative spatiotemporal MRI atlas of the fetal brain for automatic segmentation and analysis of early brain growth. Scientific Reports 7, 476 (2017). https://doi.org/10.1038/s41598-017-00525-w  
-[4] BrainWeb: Simulated brain database. Https://brainweb.bic.mni.mcgill.ca/brainweb/
+*References:*  
+*[1] Weigel, M. Extended phase graphs: Dephasing, RF pulses, and echoes - pure and simple. Journal of Magnetic Resonance Imaging 41, 266–295 (2015). https://doi.org/10.1002/jmri.24619*  
+*[2] https://github.com/matthias-weigel/EPG*  
+*[3] Gholipour, A. et al. A normative spatiotemporal MRI atlas of the fetal brain for automatic segmentation and analysis of early brain growth. Scientific Reports 7, 476 (2017). https://doi.org/10.1038/s41598-017-00525-w*  
+*[4] BrainWeb: Simulated brain database. Https://brainweb.bic.mni.mcgill.ca/brainweb/*
 
 
 ### Distribution of FaBiAN and Citation
@@ -60,7 +60,7 @@ helene.lajous@unil.ch
 
 https://github.com/Medical-Image-Analysis-Laboratory/FaBiAN/  
   
-  
+
 Copyright (c) 2019-2023  
 
 Medical Image Analysis Laboratory (MIAL), Lausanne, Switzerland  
