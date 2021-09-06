@@ -13,7 +13,7 @@ __CIBM Center for Biomedical Imaging, Switzerland__
 
 ----
 
-![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/Medical-Image-Analysis-Laboratory/FaBiAN) [![DOI](https://zenodo.org/badge/395458794.svg)](https://zenodo.org/badge/latestdoi/395458794) [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/Medical-Image-Analysis-Laboratory/FaBiAN) [![DOI](https://zenodo.org/badge/395458794.svg)](https://zenodo.org/badge/latestdoi/395458794) [![License](https://img.shields.io/badge/License-BSD%203--Clause-red.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 
 FaBiAN is the first numerical phantom that simulates realistic T2-weighted magnetic resonance images (MRI) of the developing fetal brain throughout gestation.
