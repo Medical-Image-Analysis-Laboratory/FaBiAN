@@ -4,11 +4,11 @@
 %  Echo (FSE) sequences.                                                  %
 %                                                                         %
 %        KSpace = Kspace_sampling(                     T2decay_zp, ...    %
-%                                                     Fetal_Brain, ...    %
 %                                                 b1map_upsampled, ...    %
 %                                             Fetal_Brain_Tissues, ...    %
 %                                                          SimRes, ...    %
 %                                                 sampling_factor, ...    %
+%                                                       
 %                                                              B0, ...    %
 %                                         motion_corrupted_slices, ...    %
 %                                        translation_displacement, ...    %
@@ -94,25 +94,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function KSpace = Kspace_sampling(                     T2decay_zp, ...
-                                                      Fetal_Brain, ...
-                                                  b1map_upsampled, ...
-                                              Fetal_Brain_Tissues, ...
+function KSpace = Kspace_sampling(                     T2decay_slice, ...    
                                                            SimRes, ...
                                                   sampling_factor, ...
-                                                               B0, ...
-                                          motion_corrupted_slices, ...
-                                         translation_displacement, ...
-                                                   rotation_angle, ...
-                                                    rotation_axis, ...
-                                  interpolation_method_upsampling, ...
-                                                              ETL, ...
-                                                              ESP, ...
                                                             TEeff, ...
                                                                TR, ...
-                                                         NbSlices, ...
-                                          interleavedSlices_index, ...
-                                                         Sl_to_Sl, ...
+                                                            index, ...
                                                      SliceProfile, ...
                                                    SliceThickness, ...
                                                           FOVRead, ...
@@ -123,138 +110,87 @@ function KSpace = Kspace_sampling(                     T2decay_zp, ...
                                                          RefLines)
 
 % Input check
-if nargin < 27
+if nargin < 14
     error('Missing input(s).');
-elseif nargin > 27
+elseif nargin > 14
     error('Too many inputs.');
 end
 
 % Memory pre-allocation
-Sl_Volume = zeros(size(T2decay_zp,1), size(T2decay_zp,2), NbSlices, size(T2decay_zp,4));
+Sl_Volume = zeros(size(T2decay_slice,1), size(T2decay_slice,2), 1, size(T2decay_slice,4));
 
 % Preload K-Space array which has dimensions of number of lines, number of
 % Phase Encoding directions, and number of Slices
-KSpace = zeros(BaseResolution, nPE, NbSlices, 'single');
+KSpace = zeros(BaseResolution, nPE, 1, 'single');
 
 % Create a "SLAB" array which is essentially the K-Space of our
 % multislice volume
-SLAB = zeros([BaseResolution, nPE, NbSlices, size(T2decay_zp,4)]);
+SLAB = zeros([BaseResolution, nPE, 1, size(T2decay_slice,4)]);
 
 SubunitRes = SimRes / sampling_factor;  %mm
 
-% Computation time to sample k-space
-tic
 
-motion_index = 0;
 
-% Loop through slices
-for iSlice=1:length(interleavedSlices_index)
-    disp(['Slice ', num2str(interleavedSlices_index(iSlice)), ' of ', num2str(length(interleavedSlices_index))])
-    index = interleavedSlices_index(iSlice)*length(Sl_to_Sl)-(length(Sl_to_Sl)-1);
-    % Inter-slice motion -
-    % - Random translation: uniform distribution between
-    % [-translation_amplitude,+translation_amplitude]mm
-    if any(interleavedSlices_index(iSlice)==motion_corrupted_slices)
-        motion_index = motion_index + 1;
-        Fetal_Brain_rotated = moving_3Dbrain(                             Fetal_Brain, ...
-                                                                               SimRes, ...
-                                             translation_displacement(motion_index,:), ...
-                                                                            'nearest', ...
-                                                         rotation_angle(motion_index), ...
-                                                        rotation_axis(motion_index,:), ...
-                                                                            'nearest', ...
-                                                                               'crop');
-        Fetal_Brain_rotated_upsampled = sampling_OoP(            Fetal_Brain_rotated, ...
-                                                                     sampling_factor, ...
-                                                     interpolation_method_upsampling);
-        [ref_T1map_rotated, ref_T2map_rotated] = tissue_to_MR(Fetal_Brain_rotated_upsampled, ...
-                                                                        Fetal_Brain_Tissues, ...
-                                                                                         B0);
-        T2decay_moved = compute_t2decay(Fetal_Brain_rotated_upsampled, ...
-                                                      b1map_upsampled, ...
-                                                    ref_T1map_rotated, ...
-                                                    ref_T2map_rotated, ...
-                                                                  ETL, ...
-                                                                  ESP, ...
-                                                      sampling_factor);
-        T2decay_moved_zp = Resize_Volume(T2decay_moved, size(T2decay_zp));
-        T2decay_zp(:,:,index:index+SliceThickness/SubunitRes-1,:) = T2decay_moved_zp(:,:,index:index+SliceThickness/SubunitRes-1,:);
-        % Update the T2decay_zp variable as it is unlikely that the
-        % fetus comes back to its initial position at iSlice+1 and
-        % following slices after he moved
-        if iSlice < length(interleavedSlices_index)
-            for nextSlice=iSlice+1:length(interleavedSlices_index)
-                nextSlice_index = interleavedSlices_index(nextSlice)*length(Sl_to_Sl)-(length(Sl_to_Sl)-1);
-                T2decay_zp(:,:,nextSlice_index:nextSlice_index+SliceThickness/SubunitRes-1,:) = T2decay_moved_zp(:,:,nextSlice_index:nextSlice_index+SliceThickness/SubunitRes-1,:);
-            end
-        end
-        clear ref_T2map_rotated
-        clear ref_T1map_rotated
-        clear Fetal_Brain_rotated
-        clear Fetal_Brain_rotated_upsampled
-        clear T2decay_moved
-        clear T2decay_moved_zp
-    end
-    % Multiply the 4D matrix by the slice profile
-    T2decay_zp(:,:,index:index+SliceThickness/SubunitRes-1,:) = T2decay_zp(:,:,index:index+SliceThickness/SubunitRes-1,:).*permute(SliceProfile, [2,3,1]);
-    % Sum the contribution of all voxels at the same (x,y) location across
-    % the slice thickness direction
-    Sl_Volume(:,:,interleavedSlices_index(iSlice),:) = sum(T2decay_zp(:,:,index:index+SliceThickness/SubunitRes-1,:),3);
-    % Simulation of k-space sampling as for FSE sequences
-%     tic
-    for iEcho=1:size(Sl_Volume,4)
-        clc;
-        disp(['Echo ', num2str(iEcho), ' of ', num2str(size(Sl_Volume,4))])
-        SLAB(:,:,interleavedSlices_index(iSlice),iEcho) = Resize_Volume(fft2c(Resize_Volume(Sl_Volume(:,:,interleavedSlices_index(iSlice),iEcho), [FOVRead/SimRes, round(FOVPhase)/SimRes, NbSlices])), [BaseResolution, nPE, NbSlices]);
-    end
-%     toc
-%     tic
-	% Calculating k-space sampling based on the desired echo time occuring
-    % at the center of k-space
-    if ACF~=1 && RefLines~=0
-        temp = (nPE/2-RefLines/2)+RefLines+1:ACF:nPE;
-        SamplingOrder = fliplr([ACF:ACF:(nPE/2-RefLines/2), (nPE/2-RefLines/2)+1:(nPE/2-RefLines/2)+RefLines, temp(1:round(TEeff/TR-RefLines/2))]);
-        clear temp
-    elseif ACF==1 && RefLines==0
-        temp = nPE/2+1:ACF:nPE;
-        SamplingOrder = fliplr([ACF:ACF:nPE/2, temp(1:round(TEeff/TR))]);
-        clear temp
-    end
-    % Loop through phase encoding lines
-    for iLine=1:length(SamplingOrder)
-        KSpace(:, SamplingOrder(iLine), interleavedSlices_index(iSlice)) = SLAB(:, SamplingOrder(iLine), interleavedSlices_index(iSlice), iLine);
-    end
-    % This next block finds the missing lines and replaces them with the
-    % closest echo time
-    %Sum non-zero contributions in KSpace for slice 
-    %interleavedSlices_index(iSlice), and echo iEcho
-    if sum(sum(KSpace(:,:,interleavedSlices_index(iSlice))))~=0
-        %The sampled lines in KSpace for slice iSlice, and echo iEcho
-        %are non zero
-        SampledLines = find(squeeze(KSpace(1,:,interleavedSlices_index(iSlice)))~=0);
-        %Loop through all lines of KSpace
-        for iLine=1:size(KSpace,2)
-            %If a line was not sampled
-            if KSpace(1,iLine,interleavedSlices_index(iSlice))==0
-                %Find only the first non-zero line following iLine
-                iFind = find(SampledLines>iLine,1,'first');
-                %If a sampled line iFind was found following the
-                %non-sampled line iLine, copy this iFind line from SLAB
-                %to the corresponding line position in KSpace
-                if ~isempty(iFind)
-                    KSpace(:,iLine,interleavedSlices_index(iSlice)) = SLAB(:,iLine,interleavedSlices_index(iSlice),SamplingOrder==SampledLines(iFind));
-                else
-                    %If no sampled line was found following the non-sampled
-                    %line iLine, use hermitian symmetry to fill KSpace: the
-                    %line symmetrical to iLine compared to the center of
-                    %KSpace is size(KSpace,2)-iLine+1
-                    KSpace(:,iLine,interleavedSlices_index(iSlice)) = fliplr(conj(KSpace(:,size(KSpace,2)-iLine+1,interleavedSlices_index(iSlice)))')';
-                end
-            end
-        end
-    end
-%     toc
+% Multiply the 4D matrix by the slice profile
+T2decay_slice = T2decay_slice.*permute(SliceProfile, [2,3,1]);
+% Sum the contribution of all voxels at the same (x,y) location across
+% the slice thickness direction
+Sl_Volume = sum(T2decay_slice,3);
+% Simulation of k-space sampling as for FSE sequences
+
+for iEcho=1:size(Sl_Volume,4)
+    clc;
+    disp(['Echo ', num2str(iEcho), ' of ', num2str(size(Sl_Volume,4))])
+    SLAB(:,:,: ,iEcho) = Resize_Volume(fft2c(Resize_Volume(Sl_Volume(:,:,:,iEcho), [FOVRead/SimRes, round(FOVPhase)/SimRes, 1])), [BaseResolution, nPE, 1]);
 end
+size1=size(KSpace);
+size2=size(SLAB);
+%     tic
+% Calculating k-space sampling based on the desired echo time occuring
+% at the center of k-space
+if ACF~=1 && RefLines~=0
+    temp = (nPE/2-RefLines/2)+RefLines+1:ACF:nPE;
+    SamplingOrder = fliplr([ACF:ACF:(nPE/2-RefLines/2), (nPE/2-RefLines/2)+1:(nPE/2-RefLines/2)+RefLines, temp(1:round(TEeff/TR-RefLines/2))]);
+    clear temp
+elseif ACF==1 && RefLines==0
+    temp = nPE/2+1:ACF:nPE;
+    SamplingOrder = fliplr([ACF:ACF:nPE/2, temp(1:round(TEeff/TR))]);
+    clear temp
+end
+% Loop through phase encoding lines
+for iLine=1:length(SamplingOrder)
+    KSpace(:, SamplingOrder(iLine),:) = SLAB(:, SamplingOrder(iLine),:, iLine);
+end
+% This next block finds the missing lines and replaces them with the
+% closest echo time
+%Sum non-zero contributions in KSpace for slice 
+%interleavedSlices_index(iSlice), and echo iEcho
+if sum(sum(KSpace))~=0
+    %The sampled lines in KSpace for slice iSlice, and echo iEcho
+    %are non zero
+    SampledLines = find(squeeze(KSpace(1,:,:))~=0);
+    %Loop through all lines of KSpace
+    for iLine=1:size(KSpace,2)
+        %If a line was not sampled
+        if KSpace(1,iLine,:)==0
+            %Find only the first non-zero line following iLine
+            iFind = find(SampledLines>iLine,1,'first');
+            %If a sampled line iFind was found following the
+            %non-sampled line iLine, copy this iFind line from SLAB
+            %to the corresponding line position in KSpace
+            if ~isempty(iFind)
+                KSpace(:,iLine,:) = SLAB(:,iLine,:,SamplingOrder==SampledLines(iFind));
+            else
+                %If no sampled line was found following the non-sampled
+                %line iLine, use hermitian symmetry to fill KSpace: the
+                %line symmetrical to iLine compared to the center of
+                %KSpace is size(KSpace,2)-iLine+1
+                KSpace(:,iLine,:) = fliplr(conj(KSpace(:,size(KSpace,2)-iLine+1,:))')';
+            end
+        end
+    end
+end
+
 
 % Display computation time
 fprintf('Computation time to sample k-space: %0.5f seconds.\n', toc);
