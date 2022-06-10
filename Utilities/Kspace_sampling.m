@@ -143,9 +143,7 @@ for iEcho=1:size(Sl_Volume,4)
     disp(['Echo ', num2str(iEcho), ' of ', num2str(size(Sl_Volume,4))])
     SLAB(:,:,: ,iEcho) = Resize_Volume(fft2c(Resize_Volume(Sl_Volume(:,:,:,iEcho), [FOVRead/SimRes, round(FOVPhase)/SimRes, 1])), [BaseResolution, nPE, 1]);
 end
-size1=size(KSpace);
-size2=size(SLAB);
-%     tic
+
 % Calculating k-space sampling based on the desired echo time occuring
 % at the center of k-space
 if ACF~=1 && RefLines~=0

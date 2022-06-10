@@ -69,7 +69,8 @@
 %                 the application of the next pulse (i.e., echo spacing   %
 %                 in the EPG simulations) (in ms)                         %
 %           - TEeff: effective echo time (in ms)                          %
-%           - ACF: acceleration factor                                    %
+%           - ACF: acceleration factor for K-space sampling,              %
+%                 in Half Acquisition Fourier is 2                        %
 %           - RefLines: number of lines that are consecutively sampled    %
 %                       around the center of K-space                      %
 %           - motion_level: amplitude of rigid fetal movements to         %
@@ -94,6 +95,7 @@
 function FSE_Images = FaBiAN_main(Fetal_Brain_model_path, ...
                                                       GA, ...
                                                   SimRes, ...
+                                                  acq_voxel_size,...
                                                 shift_mm, ...
                                              orientation, ...
                                                      inu, ...
@@ -119,9 +121,9 @@ function FSE_Images = FaBiAN_main(Fetal_Brain_model_path, ...
                                            output_folder)
 
 % Input check
-if nargin < 26
+if nargin < 27
     error('Missing input(s).');
-elseif nargin > 26
+elseif nargin > 27
     error('Too many inputs.');
 end
 
@@ -156,14 +158,15 @@ b1map = volume_reorient(b1map, orientation);
 % thickness, the slice gap, etc, ..., whatever the situation, keeping the
 % framework as general as possible.
 SubunitRes = SimRes / sampling_factor;   %mm
+resample_size = SimRes./acq_voxel_size;
+full_resized= [resample_size(1),resample_size(2),sampling_factor];
+Fetal_Brain_upsampled = imresize3(Fetal_Brain, ...
+                                     round(size(Fetal_Brain).*full_resized), ...
+                                           'bilinear');
 
-Fetal_Brain_upsampled = sampling_OoP(    Fetal_Brain, ...
-                                     sampling_factor, ...
-                                           'nearest');
-
-b1map_upsampled = sampling_OoP(          b1map, ...
-                               sampling_factor, ...
-                                      'linear');
+b1map_upsampled = imresize3(          b1map, ...
+                               round(size(b1map).*full_resized), ...
+                                      'bilinear');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Conversion to MR contrast                                              %
@@ -315,7 +318,7 @@ KSpace_noise = add_noise(KSpace, std_noise);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Turn back data in K-space to the image space
-FSE_Images = imresize(ifft2c(KSpace_noise), [size(KSpace,1), round(size(KSpace,2)/PhaseResolution)]);
+FSE_Images = imresize(real(ifft2c(KSpace_noise)), [size(KSpace,1), round(size(KSpace,2)/PhaseResolution)]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Save data                                                              %
