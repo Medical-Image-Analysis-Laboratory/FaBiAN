@@ -96,6 +96,7 @@ function FSE_Images = FaBiAN_main(Fetal_Brain_model_path, ...
                                                       GA, ...
                                                   SimRes, ...
                                                   acq_voxel_size,...
+                                                  final_voxel_size,...
                                                 shift_mm, ...
                                              orientation, ...
                                                      inu, ...
@@ -121,9 +122,9 @@ function FSE_Images = FaBiAN_main(Fetal_Brain_model_path, ...
                                            output_folder)
 
 % Input check
-if nargin < 27
+if nargin < 28
     error('Missing input(s).');
-elseif nargin > 27
+elseif nargin > 28
     error('Too many inputs.');
 end
 
@@ -160,13 +161,12 @@ b1map = volume_reorient(b1map, orientation);
 SubunitRes = SimRes / sampling_factor;   %mm
 resample_size = SimRes./acq_voxel_size;
 full_resized= [resample_size(1),resample_size(2),sampling_factor];
-Fetal_Brain_upsampled = imresize3(Fetal_Brain, ...
-                                     round(size(Fetal_Brain).*full_resized), ...
-                                           'bilinear');
+uwu=round(size(Fetal_Brain).*full_resized);
+Fetal_Brain_upsampled = imresize3(Fetal_Brain,uwu, 'linear');
 
 b1map_upsampled = imresize3(          b1map, ...
                                round(size(b1map).*full_resized), ...
-                                      'bilinear');
+                                      'linear');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Conversion to MR contrast                                              %
@@ -318,7 +318,7 @@ KSpace_noise = add_noise(KSpace, std_noise);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Turn back data in K-space to the image space
-FSE_Images = imresize(real(ifft2c(KSpace_noise)), [size(KSpace,1), round(size(KSpace,2)/PhaseResolution)]);
+FSE_Images = imresize(real(ifft2c(KSpace_noise)), round(size(KSpace_noise).* acq_voxel_size./final_voxel_size));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Save data                                                              %
