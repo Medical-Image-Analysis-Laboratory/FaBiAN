@@ -8,7 +8,7 @@
 %  1.5-T MAGNETOM Sola system (Siemens Healthineers, Erlangen, Germany)   %
 %  at Lausanne University Hospital (CHUV);                                %
 %  (ii) SS-FSE sequences as implemented by GE Healthcare on a 3-T whole-  %
-%  -body scanner (Signa Discovery MR750) at University Children’s         %
+%  -body scanner (Signa Discovery MR750) at University Childrenâ€™s         %
 %  Hospital Zurich.                                                       %
 %                                                                         %
 %  Images are simulated for a fetus of gestational age (GA):              %
@@ -18,7 +18,7 @@
 %  the slice slab, and with strong motion.                                %
 %                                                                         %
 %                                                                         %
-%  Hélène Lajous, 2021-07-19                                              %
+%  HÃ©lÃ¨ne Lajous, 2021-07-19                                              %
 %  helene.lajous@unil.ch                                                  %
 %                                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,7 +45,7 @@ addpath('Utilities')
 % brain for automatic segmentation and analysis of early brain growth.
 % Scientific Reports 7, 476 (2017).
 % https://doi.org/10.1038/s41598-017-00525-w
-Fetal_Brain_model_path = '/data/Simu_FSE/Atlas/CRL_Fetal_Brain_Atlas_2017v3/';
+Fetal_Brain_model_path = 'data/Simu_FSE/Atlas/CRL_FetalBrainAtlas_2017v3/';
 % Gestational age (in weeks)
 GA = 26;
 % Resolution of the Fetal_Brain images (isotropic, in mm)
@@ -59,10 +59,10 @@ orientation = 3;
 % Non-linear slowly-varying intensity non-uniformity (INU) fields (b1+) can
 % be downloaded from BrainWeb database:
 % https://brainweb.bic.mni.mcgill.ca/brainweb/about_sbd.html
-inu = '/data/Simu_FSE/rf20_B.rawb';
+inu = 'data/Simu_FSE/rf20_B.rawb';
 % Define a sampling factor to subdivide the volume in the slice thickness
 % orientation
-sampling_factor = SimRes / 0.1;
+sampling_factor = 1;
 % Main magnetic field strength
 B0 = 1.5;
 % Acquisition parameters
@@ -70,7 +70,7 @@ ESP = 4.08;  %ms
 ETL = 224;
 % Geometry
 PhaseOversampling = 0.803571000000000;
-SliceThickness = 3; %mm
+SliceThickness = 3.2; %mm
 SliceGap = 0.3; %mm
 % Resolution
 FOVRead = 360;  %mm
@@ -84,19 +84,23 @@ TEeff = 90; %ms
 ACF = 2;
 RefLines = 42;
 % Motion
-motion_level = 1;   %little motion
+motion_level = 3;   %little motion
 % Scanner zero-interpolation filling (ZIP)
 % (0: no ZIP; 1: Fermi filtering in k-space and ZIP)
 zip = 0;
 reconMatrix = BaseResolution;
 % SNR
-std_noise = 0.15;
+std_noise = 0;
 
 output_folder = output_name(          GA, ...
                             motion_level, ...
                              orientation, ...
                                 shift_mm);
+cd ..
 
+mkdir(output_folder)
+cd FaBiAN
+t1=cputime;
 HASTE_Images = FaBiAN_main(Fetal_Brain_model_path, ...
                                                GA, ...
                                            SimRes, ...
@@ -123,7 +127,7 @@ HASTE_Images = FaBiAN_main(Fetal_Brain_model_path, ...
                                       reconMatrix, ...
                                         std_noise, ...
                                     output_folder);
-
+tfinal=cputime-t1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  (ii) SS-FSE sequence (GE Healthcare)                                   %
@@ -147,7 +151,7 @@ addpath('Utilities')
 % brain for automatic segmentation and analysis of early brain growth.
 % Scientific Reports 7, 476 (2017).
 % https://doi.org/10.1038/s41598-017-00525-w
-Fetal_Brain_model_path = '/data/Simu_FSE/Atlas/CRL_Fetal_Brain_Atlas_2017v3/';
+Fetal_Brain_model_path = 'data/Simu_FSE/Atlas/CRL_FetalBrainAtlas_2017v3/';
 % Gestational age (in weeks)
 GA = 33;
 % Resolution of the Fetal_Brain images (isotropic, in mm)
@@ -161,10 +165,10 @@ orientation = 1;
 % Non-linear slowly-varying intensity non-uniformity (INU) fields (b1+) can
 % be downloaded from BrainWeb database:
 % https://brainweb.bic.mni.mcgill.ca/brainweb/about_sbd.html
-inu = '/data/Simu_FSE/rf20_B.rawb';
+inu = 'data/Simu_FSE/rf20_B.rawb';
 % Define a sampling factor to subdivide the volume in the slice thickness
 % orientation
-sampling_factor = SimRes / 0.1;
+sampling_factor = SimRes/0.1;
 % Main magnetic field strength
 B0 = 3;
 % Acquisition parameters
@@ -198,7 +202,7 @@ output_folder = output_name(          GA, ...
                             motion_level, ...
                              orientation, ...
                                 shift_mm);
-
+cd FaBiAN
 SSFSE_Images = FaBiAN_main(Fetal_Brain_model_path, ...
                                                GA, ...
                                            SimRes, ...

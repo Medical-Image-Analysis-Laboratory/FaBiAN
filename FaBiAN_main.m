@@ -69,7 +69,8 @@
 %                 the application of the next pulse (i.e., echo spacing   %
 %                 in the EPG simulations) (in ms)                         %
 %           - TEeff: effective echo time (in ms)                          %
-%           - ACF: acceleration factor                                    %
+%           - ACF: acceleration factor for K-space sampling,              %
+%                 in Half Acquisition Fourier is 2                        %
 %           - RefLines: number of lines that are consecutively sampled    %
 %                       around the center of K-space                      %
 %           - motion_level: amplitude of rigid fetal movements to         %
@@ -94,6 +95,8 @@
 function FSE_Images = FaBiAN_main(Fetal_Brain_model_path, ...
                                                       GA, ...
                                                   SimRes, ...
+                                                  acq_voxel_size,...
+                                                  final_voxel_size,...
                                                 shift_mm, ...
                                              orientation, ...
                                                      inu, ...
@@ -119,18 +122,17 @@ function FSE_Images = FaBiAN_main(Fetal_Brain_model_path, ...
                                            output_folder)
 
 % Input check
-if nargin < 26
+if nargin < 28
     error('Missing input(s).');
-elseif nargin > 26
+elseif nargin > 28
     error('Too many inputs.');
 end
 
 addpath('Utilities')
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Load fetal brain model and intensity non-uniformity fields             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+cd .. 
 % Load segmented high-resolution images of the fetal brain at gestational
 % age GA
 Fetal_Brain = brain_model(Fetal_Brain_model_path, GA);
@@ -157,13 +159,13 @@ b1map = volume_reorient(b1map, orientation);
 % thickness, the slice gap, etc, ..., whatever the situation, keeping the
 % framework as general as possible.
 SubunitRes = SimRes / sampling_factor;   %mm
+resample_size = SimRes./acq_voxel_size;
+full_resized= [resample_size(1),resample_size(2),sampling_factor];
+uwu=round(size(Fetal_Brain).*full_resized);
+Fetal_Brain_upsampled = imresize3(Fetal_Brain,uwu, 'linear');
 
-Fetal_Brain_upsampled = sampling_OoP(    Fetal_Brain, ...
-                                     sampling_factor, ...
-                                           'nearest');
-
-b1map_upsampled = sampling_OoP(          b1map, ...
-                               sampling_factor, ...
+b1map_upsampled = imresize3(          b1map, ...
+                               round(size(b1map).*full_resized), ...
                                       'linear');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -175,23 +177,6 @@ Fetal_Brain_Labels = unique(Fetal_Brain);
 Fetal_Brain_Labels = Fetal_Brain_Labels(Fetal_Brain_Labels > 0);
 % Write labels of the different segmented brain tissues in a list
 Fetal_Brain_Tissues = permute(Fetal_Brain_Labels, [2,1]);
-
-% Generate reference T1 and T2 maps of the fetal brain
-[ref_T1map, ref_T2map] = tissue_to_MR(Fetal_Brain_upsampled, Fetal_Brain_Tissues, B0);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Extended Phase Graph (EPG) simulations                                 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Run EPG simulations in every voxel of the fetal brain volume
-T2decay = compute_t2decay(Fetal_Brain_upsampled, ...
-                                b1map_upsampled, ...
-                                      ref_T1map, ...
-                                      ref_T2map, ...
-                                            ETL, ...
-                                            ESP, ...
-                                sampling_factor);
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Parameters of fetal brain FSE acquisition schemes                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -218,20 +203,13 @@ Sl_to_Sl(length(SliceProfile)+1:length(SliceProfile)+SliceGap/SubunitRes) = ones
 % The number of slices is currently set to ensure that the maximum size in
 % mm of the image matrix is an integer number of the slice thickness +
 % slice gap
-NbSlices = ceil(max([size(T2decay,1), size(T2decay,2), size(T2decay,3)/sampling_factor]) * SimRes / SubunitRes / length(Sl_to_Sl));
+NbSlices = ceil(max([size(Fetal_Brain_upsampled,1), size(Fetal_Brain_upsampled,2), size(Fetal_Brain_upsampled,3)/sampling_factor]) * SimRes / SubunitRes / length(Sl_to_Sl));
 % Corresponding matrix size
 T2decay_MaxDim = ceil(NbSlices * length(Sl_to_Sl) / (SimRes / SubunitRes));
-
-% Zero-padding of the T2decay array so that it is 3D isotropic - This makes
-% some calculations below a bit easier
-T2decay_zp = Resize_Volume(T2decay, [T2decay_MaxDim, T2decay_MaxDim, T2decay_MaxDim*sampling_factor, size(T2decay,4)]);
-% There might be a couple of slices that are just zeros due to this
-% zero-padding step.
-
+Fetal_Brain_upsampled=Resize_Volume(Fetal_Brain_upsampled,[T2decay_MaxDim,T2decay_MaxDim,T2decay_MaxDim*sampling_factor]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  K-space sampling of the simulated FSE images                           %
+%  Motion generation                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % Data sampling follows an interleaved acquisition scheme
 interleavedSlices_index = interleaved_scheme(NbSlices);
 
@@ -240,26 +218,81 @@ interleavedSlices_index = interleaved_scheme(NbSlices);
            rotation_angle, ...
             rotation_axis] = motion_transform(motion_level, ...
                                                   NbSlices);
+Fetal_Brain_rotated=Fetal_Brain;
+disp("Simulating brain movement")
+motion_index = 0;
+for iSlice=1:length(interleavedSlices_index) 
+    % Inter-slice motion -
+    % - Random translation: uniform distribution between
+    % [-translation_amplitude,+translation_amplitude]mm
+    if any(interleavedSlices_index(iSlice)==motion_corrupted_slices)
+        motion_index = motion_index + 1;
+        Fetal_Brain_rotated = moving_3Dbrain(                             Fetal_Brain_rotated, ...
+                                                                               SimRes, ...
+                                             translation_displacement(motion_index,:), ...
+                                                                            'nearest', ...
+                                                         rotation_angle(motion_index), ...
+                                                        rotation_axis(motion_index,:), ...
+                                                                            'nearest', ...
+                                                                               'crop');
+        Fetal_Brain_rotated_upsampled = sampling_OoP(            Fetal_Brain_rotated, ...
+                                                                     sampling_factor, ...
+                                                     "linear");%interpolation_method_upsampling;
+        Fetal_Brain_rotated_upsampled=Resize_Volume(Fetal_Brain_rotated_upsampled,[T2decay_MaxDim,T2decay_MaxDim,T2decay_MaxDim*sampling_factor]);
 
-KSpace = Kspace_sampling(              T2decay_zp, ...
-                                      Fetal_Brain, ...
-                                  b1map_upsampled, ...
-                              Fetal_Brain_Tissues, ...
+        
+        sliceIndex=interleavedSlices_index(iSlice)*length(Sl_to_Sl)-(length(Sl_to_Sl)-1);
+        Fetal_Brain_upsampled(:,:,sliceIndex:sliceIndex+SliceThickness/SubunitRes-1) = Fetal_Brain_rotated_upsampled(:,:,sliceIndex:sliceIndex+SliceThickness/SubunitRes-1);
+        %Perform the rotation for all following slices
+        if iSlice < length(interleavedSlices_index)
+            for nextSlice=iSlice+1:length(interleavedSlices_index)
+                nextSlice_index = interleavedSlices_index(nextSlice)*length(Sl_to_Sl)-(length(Sl_to_Sl)-1);
+                Fetal_Brain_upsampled(:,:,nextSlice_index:nextSlice_index+SliceThickness/SubunitRes-1) = Fetal_Brain_rotated_upsampled(:,:,nextSlice_index:nextSlice_index+SliceThickness/SubunitRes-1);
+            end
+        end
+    end
+end
+% Updating T1 and T2 maps
+[ref_T1map, ref_T2map] = tissue_to_MR(Fetal_Brain_upsampled,Fetal_Brain_Tissues, B0);
+b1map_upsampled=Resize_Volume(b1map_upsampled,[T2decay_MaxDim,T2decay_MaxDim,T2decay_MaxDim*sampling_factor]);
+
+
+% We start the slice-by-slice computation 
+KSpace = zeros(BaseResolution, nPE,NbSlices, 'single');
+h = waitbar(0,'Computing slice-by-slice KSpace');
+counter=0;
+for iSlice=interleavedSlices_index
+    counter=counter+1;
+    index = iSlice*length(Sl_to_Sl)-(length(Sl_to_Sl)-1);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %  Extended Phase Graph (EPG) simulations                                 %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    nextIndex=index+SliceThickness/SubunitRes-1;
+
+    % Run EPG simulations in every voxel of the fetal brain volume
+    T2decay_slice = compute_t2decay(Fetal_Brain_upsampled(:,:,index:nextIndex), ...
+                                    b1map_upsampled(:,:,index:nextIndex), ...
+                                          ref_T1map(:,:,index:nextIndex), ...
+                                          ref_T2map(:,:,index:nextIndex), ...
+                                                ETL, ...
+                                                ESP, ...
+                                    sampling_factor);
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  K-space sampling of the simulated FSE images                           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Data sampling follows an interleaved acquisition scheme
+
+
+KSpace(:,:,iSlice) = Kspace_sampling(T2decay_slice, ...
                                            SimRes, ...
-                                  sampling_factor, ...
-                                               B0, ...
-                          motion_corrupted_slices, ...
-                         translation_displacement, ...
-                                   rotation_angle, ...
-                                    rotation_axis, ...
-                                        'nearest', ...
-                                              ETL, ...
-                                              ESP, ...
+                                           sampling_factor,...
                                             TEeff, ...
                                                TR, ...
-                                         NbSlices, ...
-                          interleavedSlices_index, ...
-                                         Sl_to_Sl, ...
+                          iSlice, ...
                                      SliceProfile, ...
                                    SliceThickness, ...
                                           FOVRead, ...
@@ -268,7 +301,9 @@ KSpace = Kspace_sampling(              T2decay_zp, ...
                                               nPE, ...
                                               ACF, ...
                                          RefLines);
-
+waitbar(counter/length(interleavedSlices_index))
+end
+close(h)
 % Simulate scanner zero-interpolation filling (ZIP)
 if zip==1   %ZIP
     KSpace = zip_kspace(                                  KSpace, ...
@@ -283,7 +318,7 @@ KSpace_noise = add_noise(KSpace, std_noise);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Turn back data in K-space to the image space
-FSE_Images = imresize(ifft2c(KSpace_noise), [size(KSpace,1), round(size(KSpace,2)/PhaseResolution)]);
+FSE_Images = imresize(real(ifft2c(KSpace_noise)), round(size(KSpace_noise).* acq_voxel_size./final_voxel_size));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Save data                                                              %

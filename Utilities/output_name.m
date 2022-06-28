@@ -69,6 +69,6 @@ switch shift_mm
         shift = 'shift_p';
 end
 
-output_folder = strcat('/data/Simu_FSE/GA_', sprintf('%02s', num2str(GA)), 'w/', motion, '/', acq_plane, '/', shift, '/');
+output_folder = strcat('data/Simu_FSE/GA_', sprintf('%02s', num2str(GA)), 'w/', motion, '/', acq_plane, '/', shift, '/');
 
 end
