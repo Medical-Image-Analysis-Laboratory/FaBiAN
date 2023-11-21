@@ -60,10 +60,13 @@ elseif nargin > 8
     error('Too many inputs.');
 end
 
+% Use the information on the resolution of the anatomical model in each
+% dimension to construct a spatial referencing object associated with it
+Reference_Fetal_Brain_mm = imref3d(size(Fetal_Brain), SimRes(2), SimRes(1), SimRes(3));
+
 % Move the fetal brain anatomy independently along the three main axes
 % according to the given translation displacements (in mm)
-Reference_Fetal_Brain_mm = imref3d(size(Fetal_Brain), SimRes, SimRes, SimRes);
-[Fetal_Brain_translated, Ref_Fetal_Brain_translated_mm] = imtranslate(Fetal_Brain, Reference_Fetal_Brain_mm, translation_displacement, translation_interpolation);
+[Fetal_Brain_translated, ~] = imtranslate(Fetal_Brain, Reference_Fetal_Brain_mm, translation_displacement, translation_interpolation);
 
 % Apply 3D rotation, defined by a rotation angle and a rotation axis, to
 % the already translated fetal brain anatomy

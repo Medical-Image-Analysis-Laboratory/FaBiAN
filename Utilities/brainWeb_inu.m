@@ -41,7 +41,9 @@ x = 181;
 volume = zeros(x,y,z);
 
 % Read BrainWeb intensity non-uniformity fields (3D)
-f = fopen(inu, 'r');
+[f,msg] = fopen(inu, 'r');
+if f<1, error([msg ' File: ' inu]), end
+
 for i=1:z
     Im = fread(f, [x,y], 'uint8');
     volume(:,:,i) = Im;
@@ -49,10 +51,10 @@ end
 
 % Resize the intensity non-uniformity fields to match the fetal brain
 % volume dimensions
-b1map_res = Resize_Volume(volume, size(Fetal_Brain));
+b1map_res = imresize3(volume, size(Fetal_Brain), 'nearest');
 
 % Normalize the intensity non-uniformity fields by 1.2 (i.e., level of 40%)
-b1map = b1map_res ./ max(max(max(b1map_res))) * 1.2;
+b1map = b1map_res ./ max(b1map_res(:)) * 1.2;
 
 fclose(f);
 

@@ -1,24 +1,87 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Function that converts segmented anatomical MR images of the fetal     %
-%  brain to the corresponding reference T1 and T2 maps depending on the   %
-%  main magnetic field strength B0.                                       %
+%  brain to the corresponding reference T1 and T2 maps.                   %
 %                                                                         %
-%       [ref_T1map, ref_T2map] = tissue_to_MR(        Fetal_Brain, ...    %
-%                                             Fetal_Brain_Tissues, ...    %
-%                                                              B0);       %
+%      [ref_T1map, ref_T2map] = tissue_to_MR(        fetal_model, ...     %
+%                                                    Fetal_Brain, ...     %
+%                                            Fetal_Brain_Tissues, ...     %
+%                                                             GA, ...     %
+%                                                         sub_id, ...     %
+%                                               WM_heterogeneity, ...     %
+%                                                         affine, ...     %
+%                                                         SimRes, ...     %
+%                                                    axcodes_reo, ...     %
+%                                                          shift, ...     %
+%                                                    orientation, ...     %
+%                                                 SamplingFactor, ...     %
+%                                                          T1_WM, ...     %
+%                                                          T2_WM, ...     %
+%                                                          T1_GM, ...     %
+%                                                          T2_GM, ...     %
+%                                                         T1_CSF, ...     %
+%                                                         T2_CSF)         %
 %                                                                         %
-%  inputs:  - Fetal_Brain: segmented high-resolution 3D volume of the     %
+%  inputs:  - fetal_model: anatomical model of the fetal brain            %
+%           - Fetal_Brain: segmented high-resolution 3D volume of the     %
 %                          fetal brain                                    %
 %           - Fetal_Brain_Tissues: list of tissues in the fetal brain     %
 %                                  that were segmented and labeled        %
-%           - B0: main magnetic field strength                            %
+%           - GA: gestational age of the fetus (in weeks)                 %
+%           - sub_id: subject ID                                          %
+%           - WM_heterogeneity: boolean value that determines wether to   %
+%                               implement (1) or not (0) white matter     %
+%                               maturation processes in the simulated     %
+%                               images                                    %
+%           - affine: affine orientation matrix of the anatomical model   %
+%                     of the fetal brain                                  %
+%           - SimRes: resolution of the 3D anatomical model of the fetal  %
+%                     brain                                               %
+%           - axcodes_reo: output axes codes of the reoriented 3D         %
+%                          anatomical model of the fetal brain with the   %
+%                          slice thickness encoded in the third           %
+%                          dimension                                      %
+%           - shift: displacement (in voxels) of the slice slab in the    %
+%                    slice thickness direction                            %
+%           - orientation: strict acquisition plane (axial, coronal or    %
+%                          sagittal)                                      %
+%           - SamplingFactor: factor by which the fetal brain volume and  %
+%                             the B1 bias field have been upsampled       %
+%           - InterpolationMethod: interpolation method used to assign a  %
+%                                  value to every voxel of a resampled    %
+%                                  3D volume. Images generated for the    %
+%                                  qualitative evaluation by the          %
+%                                  radiologists were simulated from       %
+%                                  partial volume maps bilinearly         %
+%                                  interpolated. To reduce the            %
+%                                  computational burden that arises from  %
+%                                  EPG simulations with many non-unique   %
+%                                  combinations of [b1, T1, T2], the      %
+%                                  images generated for the data          %
+%                                  augmentation experiment were           %
+%                                  simulated from partial volume maps     %
+%                                  interpolated using a nearest-          %
+%                                  -neighboor method.                     %
+%           - T1_WM: T1 relaxation time of white matter at the magnetic   %
+%                    field strength specified for the simulated           %
+%                    acquisition                                          %
+%           - T2_WM: T2 relaxation time of white matter at the magnetic   %
+%                    field strength specified for the simulated           %
+%                    acquisition                                          %
+%           - T1_GM: T1 relaxation time of gray matter at the magnetic    %
+%                    field strength specified for the simulated           %
+%                    acquisition                                          %
+%           - T2_GM: T2 relaxation time of gray matter at the magnetic    %
+%                    field strength specified for the simulated           %
+%                    acquisition                                          %
+%           - T1_CSF: T1 relaxation time of cerebrospinal fluid at the    %
+%                     magnetic field strength specified for the           %
+%                     simulated acquisition                               %
+%           - T2_CSF: T2 relaxation time of cerebrospinal fluid at the    %
+%                     magnetic field strength specified for the           %
+%                     simulated acquisition                               %
 %                                                                         %
 %  outputs: - ref_T1map: reference T1 map of the fetal brain              %
 %           - ref_T2map: reference T2 map of the fetal brain              %
-%                                                                         %
-%  T1 and T2 values of the segmented fetal brain tissues are stored in a  %
-%  table with the format:                                                 %
-%  [T1 at 1.5 T, T2 at 1.5 T, T1 at 3.0 T, T2 at 3.0 T]                   %
 %                                                                         %
 %  Relaxation values of the fetal brain at 1.5 T are based on the         %
 %  literature:                                                            %
@@ -107,56 +170,95 @@
 %  Hélène Lajous, 2020-05-10                                              %
 %  Adapted from: XCAT_to_MR.m (https://github.com/cwroy/Fetal-XCMR/)      %
 %  helene.lajous@unil.ch                                                  %
+%  Modified by Andrés le Boeuf, 2022-03-23                                %
+%  andres.le.boeuf@estudiantat.ucp.edu                                    %
+%  Modified by Hélène Lajous, 2023-03-23                                  %
 %                                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [ref_T1map, ref_T2map] = tissue_to_MR(        Fetal_Brain, ...
+function [ref_T1map, ref_T2map] = tissue_to_MR(        fetal_model, ...
+                                                       Fetal_Brain, ...
                                                Fetal_Brain_Tissues, ...
-                                                                B0)
+                                                                GA, ...
+                                                            sub_id, ...
+                                                  WM_heterogeneity, ...
+                                                            affine, ...
+                                                            SimRes, ...
+                                                       axcodes_reo, ...
+                                                             shift, ...
+                                                       orientation, ...
+                                                    SamplingFactor, ...
+                                               InterpolationMethod, ...
+                                                             T1_WM, ...
+                                                             T2_WM, ...
+                                                             T1_GM, ...
+                                                             T2_GM, ...
+                                                            T1_CSF, ...
+                                                            T2_CSF)
 
 % Input check
-if nargin < 3
+if nargin < 19
     error('Missing input(s).');
-elseif nargin > 3
+elseif nargin > 19
     error('Too many inputs!');
 end
 
 % Assign T1 and T2 values to every fetal tissue according to its label
-Tissue(37,:) = [2000, 162, 2500, 162];
-Tissue(38,:) = [2000, 162, 2500, 162];
-Tissue(41,:) = [2000, 162, 2500, 162];
-Tissue(42,:) = [2000, 162, 2500, 162];
-Tissue(71,:) = [2000, 162, 2500, 162];
-Tissue(72,:) = [2000, 162, 2500, 162];
-Tissue(73,:) = [2000, 162, 2500, 162];
-Tissue(74,:) = [2000, 162, 2500, 162];
-Tissue(77,:) = [2000, 162, 2500, 162];
-Tissue(78,:) = [2000, 162, 2500, 162];
-Tissue(91,:) = [3000, 232, 3300, 232];
-Tissue(92,:) = [4000, 2000, 4400, 2000];
-Tissue(93,:) = [4000, 2000, 4400, 2000];
-Tissue(94,:) = [3000, 232, 3300, 232];
-Tissue(100,:) = [3000, 232, 3300, 232];
-Tissue(101,:) = [3000, 232, 3300, 232];
-Tissue(108,:) = [2000, 162, 2500, 162];
-Tissue(109,:) = [2000, 162, 2500, 162];
-Tissue(110,:) = [3000, 232, 3300, 232];
-Tissue(111,:) = [3000, 232, 3300, 232];
-Tissue(112,:) = [2000, 162, 2500, 162];
-Tissue(113,:) = [2000, 162, 2500, 162];
-Tissue(114,:) = [3000, 232, 3300, 232];
-Tissue(115,:) = [3000, 232, 3300, 232];
-Tissue(116,:) = [3000, 232, 3300, 232];
-Tissue(117,:) = [3000, 232, 3300, 232];
-Tissue(118,:) = [3000, 232, 3300, 232];
-Tissue(119,:) = [3000, 232, 3300, 232];
-Tissue(120,:) = [3000, 232, 3300, 232];
-Tissue(121,:) = [3000, 232, 3300, 232];
-Tissue(122,:) = [3000, 232, 3300, 232];
-Tissue(123,:) = [3000, 232, 3300, 232];
-Tissue(124,:) = [4000, 2000, 4400, 2000];
-Tissue(125,:) = [3000, 232, 3300, 232];
+switch fetal_model
+    case 'STA'
+        Tissue(37,:) = [T1_GM, T2_GM];
+        Tissue(38,:) = [T1_GM, T2_GM];
+        Tissue(41,:) = [T1_GM, T2_GM];
+        Tissue(42,:) = [T1_GM, T2_GM];
+        Tissue(71,:) = [T1_GM, T2_GM];
+        Tissue(72,:) = [T1_GM, T2_GM];
+        Tissue(73,:) = [T1_GM, T2_GM];
+        Tissue(74,:) = [T1_GM, T2_GM];
+        Tissue(77,:) = [T1_GM, T2_GM];
+        Tissue(78,:) = [T1_GM, T2_GM];
+        Tissue(91,:) = [T1_WM, T2_WM];
+        Tissue(92,:) = [T1_CSF, T2_CSF];
+        Tissue(93,:) = [T1_CSF, T2_CSF];
+        Tissue(94,:) = [T1_WM, T2_WM];
+        Tissue(100,:) = [T1_WM, T2_WM];
+        Tissue(101,:) = [T1_WM, T2_WM];
+        Tissue(108,:) = [T1_GM, T2_GM];
+        Tissue(109,:) = [T1_GM, T2_GM];
+        Tissue(110,:) = [T1_WM, T2_WM];
+        Tissue(111,:) = [T1_WM, T2_WM];
+        Tissue(112,:) = [T1_GM, T2_GM];
+        Tissue(113,:) = [T1_GM, T2_GM];
+        Tissue(114,:) = [T1_WM, T2_WM];
+        Tissue(115,:) = [T1_WM, T2_WM];
+        Tissue(116,:) = [T1_WM, T2_WM];
+        Tissue(117,:) = [T1_WM, T2_WM];
+        Tissue(118,:) = [T1_WM, T2_WM];
+        Tissue(119,:) = [T1_WM, T2_WM];
+        Tissue(120,:) = [T1_WM, T2_WM];
+        Tissue(121,:) = [T1_WM, T2_WM];
+        Tissue(122,:) = [T1_WM, T2_WM];
+        Tissue(123,:) = [T1_WM, T2_WM];
+        Tissue(124,:) = [T1_CSF, T2_CSF];
+        Tissue(125,:) = [T1_WM, T2_WM];
+    case 'FeTA_CHUV'
+        Tissue(1,:) = [T1_CSF, T2_CSF]; %CSF
+        Tissue(2,:) = [T1_GM, T2_GM];   %GM
+        Tissue(3,:) = [T1_WM, T2_WM];   %WM
+        Tissue(4,:) = [T1_CSF, T2_CSF]; %lateral ventricles
+        Tissue(5,:) = [T1_WM, T2_WM];   %cerebellum
+        Tissue(6,:) = [T1_GM, T2_GM];   %subcortical GM
+        Tissue(7,:) = [T1_WM, T2_WM];   %brainstem
+    case 'FeTA' %refined FeTA dataset (Lucas Fidon, FeTA2021_Release1and2Corrected_v4)
+        Tissue(1,:) = [T1_WM, T2_WM];   %WM (excluding corpus callosum)
+        Tissue(2,:) = [T1_CSF, T2_CSF]; %intra-axial CSF
+        Tissue(3,:) = [T1_WM, T2_WM];   %cerebellum
+        Tissue(4,:) = [T1_CSF, T2_CSF]; %extra-axial CSF
+        Tissue(5,:) = [T1_GM, T2_GM];   %cortical GM
+        Tissue(6,:) = [T1_GM, T2_GM];   %deep GM
+        Tissue(7,:) = [T1_WM, T2_WM];   %brainstem
+        Tissue(8,:) = [T1_WM, T2_WM];   %corpus callosum
+end
 
 % Computation time
 tic
@@ -166,28 +268,47 @@ Unwrap_Fetal_Brain = Fetal_Brain(:);
 ref_T1map = zeros(length(Unwrap_Fetal_Brain),1);
 ref_T2map = zeros(length(Unwrap_Fetal_Brain),1);
 
-% Relaxometry properties depend on the magnetic field strength
-switch B0
-    case 1.5
-        T2_index = 2;
-        T1_index = 1;
-    case 3
-        T2_index = 4;
-        T1_index = 3;
-end
+% % Relaxometry properties depend on the magnetic field strength
+% switch B0
+%     case 1.5
+%         T2_index = 2;
+%         T1_index = 1;
+%     case 3
+%         T2_index = 4;
+%         T1_index = 3;
+% end
 
 % Fetal brain properties
 for label=Fetal_Brain_Tissues(1:length(Fetal_Brain_Tissues))
     brain = find(Unwrap_Fetal_Brain==label);
     for k=1:length(brain)
-        ref_T1map(brain(k)) = Tissue(label, T1_index);
-        ref_T2map(brain(k)) = Tissue(label, T2_index);
+        ref_T1map(brain(k)) = Tissue(label, 1);
+        ref_T2map(brain(k)) = Tissue(label, 2);
     end
 end
+
 ref_T1map = reshape(ref_T1map, size(Fetal_Brain));
 ref_T2map = reshape(ref_T2map, size(Fetal_Brain));
 
+% White matter maturation processes implementation
+if WM_heterogeneity == 1
+    [ref_T1map, ref_T2map] = WM_maturation(        fetal_model, ...
+                                                     ref_T1map, ...
+                                                     ref_T2map, ...
+                                                            GA, ...
+                                                        sub_id, ...
+                                                        'FAST', ...
+                                                        affine, ...
+                                                        SimRes, ...
+                                                   axcodes_reo, ...
+                                                         shift, ...
+                                                   orientation, ...
+                                                SamplingFactor, ...
+                                           InterpolationMethod);
+end
+
 % Display computation time
-fprintf('Computation time to convert segmented high-resolution anatomical images of the fetal brain to MR contrast: %0.5f seconds.\n', toc);
+time1 = toc;
+fprintf('Computation time to convert segmented high-resolution anatomical images of the fetal brain to MR contrast: %0.5f seconds.\n', time1);
 
 end

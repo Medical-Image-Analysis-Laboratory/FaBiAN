@@ -3,17 +3,29 @@
 %  according to the specified interpolation method in the slice           %
 %  thickness direction (3. index, "Out-of-Plane").                        %
 %                                                                         %
-%          Volume_resampled = sampling_OoP(              Volume, ...      %
-%                                               sampling_factor, ...      %
-%                                          interpolation_method);         %
+%           VolumeResampled = sampling_OoP(             Volume, ...       %
+%                                               SamplingFactor, ...       %
+%                                          InterpolationMethod);          %
 %                                                                         %
 %  inputs:  - Volume: 3D volume to be resampled                           %
-%           - sampling_factor: factor of up- or down-sampling             %
-%           - interpolation_method: interpolation method used to assign   %
-%                                   a value to every voxel of the 3D      %
-%                                   volume after resampling               %
+%           - SamplingFactor: factor of up- or down-sampling              %
+%           - InterpolationMethod: interpolation method used to assign a  %
+%                                  value to every voxel of the resampled  %
+%                                  3D volume. Images generated for the    %
+%                                  qualitative evaluation by the          %
+%                                  radiologists were simulated from       %
+%                                  partial volume maps bilinearly         %
+%                                  interpolated. To reduce the            %
+%                                  computational burden that arises from  %
+%                                  EPG simulations with many non-unique   %
+%                                  combinations of (b1,T1,T2), the        %
+%                                  images generated for the data          %
+%                                  augmentation experiment were           %
+%                                  simulated from partial volume maps     %
+%                                  interpolated using a nearest-          %
+%                                  -neighboor method.                     %
 %                                                                         %
-%  output:  - Volume_resampled: 3D volume after resampling in the slice   %
+%  output:  - VolumeResampled: 3D volume after resampling in the slice    %
 %                               thickness direction                       %
 %                                                                         %
 %                                                                         %
@@ -23,9 +35,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function Volume_resampled = sampling_OoP(              Volume, ...
-                                              sampling_factor, ...
-                                         interpolation_method)
+function VolumeResampled = sampling_OoP(             Volume, ...
+                                             SamplingFactor, ...
+                                        InterpolationMethod)
 
 % Input check
 if nargin < 3
@@ -35,16 +47,16 @@ elseif nargin > 3
 end
 
 
-switch interpolation_method
+switch InterpolationMethod
     case 'nearest'
         for index=1:size(Volume,3)
-            upsampling = index*sampling_factor-(sampling_factor-1);
-            Volume_resampled(:,:,upsampling:upsampling+sampling_factor-1) = repmat(Volume(:,:,index), [1, 1, sampling_factor]);
+            upsampling = index*SamplingFactor-(SamplingFactor-1);
+            VolumeResampled(:,:,upsampling:upsampling+SamplingFactor-1) = repmat(Volume(:,:,index), [1, 1, SamplingFactor]);
         end
     case 'linear'
         Volume_orient = reshape(Volume, [size(Volume,1)*size(Volume,2), size(Volume,3)]);
-        Volume_up = imresize(Volume_orient, [size(Volume_orient,1) size(Volume_orient,2)*sampling_factor], 'bilinear');
-        Volume_resampled = reshape(Volume_up, [size(Volume,1), size(Volume,2), size(Volume_up,2)]);
+        Volume_up = imresize(Volume_orient, [size(Volume_orient,1) size(Volume_orient,2)*SamplingFactor], 'bilinear');
+        VolumeResampled = reshape(Volume_up, [size(Volume,1), size(Volume,2), size(Volume_up,2)]);
 end
 
 % Display message for debugging

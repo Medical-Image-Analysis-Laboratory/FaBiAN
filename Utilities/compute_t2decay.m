@@ -16,6 +16,7 @@
 %                                                  ref_T1map, ...         %
 %                                                  ref_T2map, ...         %
 %                                                        ETL, ...         %
+%                                                  flipAngle, ...         %
 %                                                        ESP, ...         %
 %                                            sampling_factor);            %
 %                                                                         %
@@ -29,6 +30,7 @@
 %           - ref_T1map: reference T1 map of the fetal brain (3D)         %
 %           - ref_T2map: reference T2 map of the fetal brain (3D)         %
 %           - ETL: echo train length, i.e. number of 180°-RF pulses       %
+%           - flipAngle: refocusing flip angle (in degrees)               %
 %           - ESP: echo spacing (in ms)                                   %
 %           - sampling_factor: factor by which the fetal brain volume     %
 %                              and the B1 bias field have been upsampled  %
@@ -50,13 +52,14 @@ function T2decay = compute_t2decay(Fetal_Brain_upsampled, ...
                                                ref_T1map, ...
                                                ref_T2map, ...
                                                      ETL, ...
+                                               flipAngle, ...
                                                      ESP, ...
                                          sampling_factor)
 
 % Input check
-if nargin < 7
+if nargin < 8
     error('Missing input(s).');
-elseif nargin > 7
+elseif nargin > 8
     error('Too many inputs.');
 end
 
@@ -72,13 +75,13 @@ unwrap_ref_T2map = ref_T2map(:);
 imap = imap(umap(:,2)~=0, :);
 umap = umap(umap(:,2)~=0, :);
 
-uT2decay = zeros(length(umap), ETL);
+uT2decay = zeros(size(umap,1), ETL);
 
 % Computation time
 tic
 
 parfor i=1:size(uT2decay,1)
-    uT2decay(i, :) = real(cp_cpmg_epg_domain_fplus_fminus(umap(i,1).*90, ETL, umap(i,1).*180, ESP, umap(i,2), umap(i,3)))/sampling_factor;
+    uT2decay(i, :) = real(cp_cpmg_epg_domain_fplus_fminus(umap(i,1).*90, ETL, umap(i,1).*flipAngle, ESP, umap(i,2), umap(i,3)))/sampling_factor;
 end
 
 T2decay = zeros(length(Fetal_Brain_upsampled(:)), ETL, 'single');
@@ -91,6 +94,7 @@ end
 T2decay = reshape(T2decay, [size(Fetal_Brain_upsampled), size(T2decay,2)]);
 
 % Display computation time
-fprintf('Computation time to run EPG simulations in every voxel of the image: %0.5f seconds.\n', toc);
+time2=toc;
+fprintf('Computation time to run EPG simulations in every voxel of the image: %0.5f seconds.\n', time2);
 
 end
