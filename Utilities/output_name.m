@@ -18,6 +18,9 @@
 %           - shift_mm: displacement (in mm) of the slice slab in the     %
 %                       slice thickness direction between two             %
 %                       simulations in the same orientation               %
+%          - WM_heterogeneity: boolean value to decide whether to         %
+%                              reproduce the WM heterogeneity of the      %
+%                              fetal brain simulation (1) or not (0)      %
 %                                                                         %
 %  output:  - output_folder: folder where the simulated images are saved  %
 %                                                                         %
@@ -31,12 +34,13 @@
 function output_folder = output_name(          GA, ...
                                      motion_level, ...
                                       orientation, ...
-                                         shift_mm)
+                                         shift_mm, ...
+                                      WM_heterogeneity)
 
 % Input check
-if nargin < 4
+if nargin < 5
     error('Missing input(s).');
-elseif nargin > 4
+elseif nargin > 5
     error('Too many inputs.');
 end
 
@@ -69,6 +73,17 @@ switch shift_mm
         shift = 'shift_p';
 end
 
-output_folder = strcat('/data/Simu_FSE/GA_', sprintf('%02s', num2str(GA)), 'w/', motion, '/', acq_plane, '/', shift, '/');
+switch WM_heterogeneity
+    case 0
+        WM = 'no_WM_maturation';
+    case 1
+        WM = 'with_WM_maturation';
+end
+
+output_folder = strcat('./data/Simu_FSE/GA_', sprintf('%02s', num2str(GA)), 'w/', motion, '/', acq_plane, '/', shift, '/', WM, '/');
+
+if ~exist(output_folder, 'dir')
+    mkdir(output_folder)
+end
 
 end
