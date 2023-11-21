@@ -1,4 +1,4 @@
-# FaBiAN: Fetal Brain magnetic resonance Acquisition Numerical phantom
+# FaBiAN: A Fetal Brain magnetic resonance Acquisition Numerical phantom
 
 ----
 
@@ -45,7 +45,7 @@ Non-linear slowly-varying intensity non-uniformities due to transmit field inhom
 
 FaBiAN source code is distributed as Matlab files under the open source BSD 3-Clause License to support its use for research purposes. Anyone is allowed to use the original and/or modified code for non-commercial purposes. See [LICENSE](https://github.com/Medical-Image-Analysis-Laboratory/FaBiAN/blob/main/LICENSE) file for details.
 
-If you publish research using FaBiAN, please cite the related manuscript: Lajous, H. et al. FaBiAN: A Fetal Brain magnetic resonance Acquisition Numerical phantom. Submitted to Scientific Reports (2021).
+If you publish research using FaBiAN, please cite the related manuscript: Lajous, H. et al. A Fetal Brain magnetic resonance Acquisition Numerical phantom (FaBiAN). Scientific Reports 12, 8682 (2022). https://doi.org/10.1038/s41598-022-10335-4
 
 
 ## Acknowledgements
