@@ -56,7 +56,7 @@ If you publish research using FaBiAN, please cite the related manuscripts:
 
 ## Acknowledgements
 
-This work was supported by the Swiss National Science Foundation through grant 205321-182602. We acknowledge access to the facilities and expertise of the CIBM Center for Biomedical Imaging, a Swiss research center of excellence founded and supported by Lausanne University Hospital (CHUV), University of Lausanne (UNIL), Ecole polytechnique fédérale de Lausanne (EPFL), University of Geneva (UNIGE) and Geneva University Hospitals (HUG).
+This work was supported by the ProTechno Foundation and the Swiss National Science Foundation through grant 205321-182602. We acknowledge access to the facilities and expertise of the CIBM Center for Biomedical Imaging, a Swiss research center of excellence founded and supported by Lausanne University Hospital (CHUV), University of Lausanne (UNIL), Ecole polytechnique fédérale de Lausanne (EPFL), University of Geneva (UNIGE) and Geneva University Hospitals (HUG).
 
 Hélène Lajous would like to thank all the people who have contributed to the development of FaBiAN. Special thanks to Tom Hilbert for sharing his extensive knowledge of FSE sequences, and to Jean-Baptiste Ledoux and Ruth Tuura for their help in understanding the parameters specific to the implementation of HASTE and SS-FSE sequences respectively, as they are used in clinical routine for fetal brain examination.
 
